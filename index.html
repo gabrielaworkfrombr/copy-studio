@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copy Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0e0f;--bg2:#161618;--bg3:#1e1e21;
+  --border:#2a2a2e;--border2:#3a3a40;
+  --text:#e8e8ea;--text2:#8a8a92;--text3:#52525a;
+  --accent:#c8f060;--accent2:#a8d040;
+  --adim:rgba(200,240,96,0.1);--adim2:rgba(200,240,96,0.06);
+  --red:#ff5f5f;--rdim:rgba(255,95,95,0.1);
+  --blue:#60a8f0;--bdim:rgba(96,168,240,0.1);
+  --amber:#f0c060;--amdim:rgba(240,192,96,0.1);
+  --r:8px;--rl:12px;
+  --f:'DM Sans',sans-serif;--m:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--f);min-height:100vh;overflow-x:hidden}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.main{flex:1;overflow-y:auto;min-width:0}
+.logo-wrap{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.logo-mark{font-family:var(--m);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.logo-name{font-size:17px;font-weight:500}
+.nav-wrap{padding:8px 0;flex:1}
+.nav-sec{padding:14px 18px 4px;font-size:10px;font-family:var(--m);letter-spacing:.1em;color:var(--text3);text-transform:uppercase}
+.nb{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--f)}
+.nb:hover{color:var(--text);background:var(--bg3)}
+.nb.on{color:var(--accent);background:var(--adim2)}
+.nb svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.nb.on svg{opacity:1}
+.sf{padding:14px 18px;border-top:1px solid var(--border);font-family:var(--m);font-size:10px;color:var(--text3)}
+.ph{padding:24px 28px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ph h1{font-size:18px;font-weight:500}
+.ph p{font-size:12px;color:var(--text2);margin-top:3px}
+.ph-r{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pc{padding:22px 28px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r);font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid transparent;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.bp{background:var(--accent);color:#0e0e0f;border-color:var(--accent)}
+.bp:hover{background:var(--accent2)}
+.bg{background:transparent;color:var(--text2);border-color:var(--border2)}
+.bg:hover{color:var(--text);background:var(--bg3)}
+.bd{background:transparent;color:var(--red);border-color:rgba(255,95,95,.3)}
+.bd:hover{background:var(--rdim)}
+.bsm{padding:5px 10px;font-size:12px}
+.bxs{padding:3px 8px;font-size:11px}
+.bic{padding:6px}
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:11px;font-family:var(--m);color:var(--text2);margin-bottom:5px;letter-spacing:.04em}
+.fi,.fs,.ft{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--f);font-size:13px;padding:8px 11px;transition:border-color .15s;outline:none}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--border2)}
+.fs{appearance:none;cursor:pointer}
+.ft{resize:vertical;min-height:70px;line-height:1.6}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fful{grid-column:1/-1}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px}
+.card+.card{margin-top:8px}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-family:var(--m);padding:2px 7px;border-radius:4px}
+.bg-g{background:var(--adim);color:var(--accent)}
+.bg-r{background:var(--rdim);color:var(--red)}
+.bg-b{background:var(--bdim);color:var(--blue)}
+.bg-a{background:var(--amdim);color:var(--amber)}
+.bg-gr{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.cl-grid{display:grid;gap:8px}
+.cl-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px 18px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px}
+.cl-card:hover{border-color:var(--border2);background:var(--bg3)}
+.cl-av{width:36px;height:36px;border-radius:50%;background:var(--adim);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--accent);flex-shrink:0;font-family:var(--m)}
+.cl-info{flex:1;min-width:0}
+.cl-name{font-size:13px;font-weight:500}
+.cl-niche{font-size:12px;color:var(--text2);margin-top:1px}
+.cl-acts{display:flex;gap:5px;opacity:0;transition:opacity .15s}
+.cl-card:hover .cl-acts{opacity:1}
+.sep{font-size:10px;font-family:var(--m);color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin:20px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.empty{text-align:center;padding:52px 20px}
+.ei{font-size:26px;margin-bottom:10px;opacity:.2}
+.et{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:4px}
+.es{font-size:12px;color:var(--text3)}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-ov.show{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);width:100%;max-width:580px;max-height:90vh;overflow-y:auto}
+.mh{padding:16px 20px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:15px;font-weight:500}
+.mb{padding:18px 20px}
+.mf{padding:13px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.tw{position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px;z-index:200}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:8px 13px;font-size:12px;color:var(--text);transform:translateY(8px);opacity:0;transition:all .2s;max-width:240px}
+.toast.show{transform:translateY(0);opacity:1}
+.tok{border-color:rgba(200,240,96,.4);color:var(--accent)}
+.terr{border-color:rgba(255,95,95,.4);color:var(--red)}
+/* STEP FLOW */
+.step-bar{display:flex;align-items:center;gap:0;margin-bottom:22px}
+.step{display:flex;align-items:center;gap:8px;font-size:12px;font-family:var(--m);color:var(--text3)}
+.step.on{color:var(--accent)}
+.step.done{color:var(--text2)}
+.step-n{width:22px;height:22px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.step.done .step-n{background:var(--bg3)}
+.step-sep{flex:1;height:1px;background:var(--border);margin:0 8px;max-width:32px}
+/* MODE CARDS */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.mode-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:18px 18px;cursor:pointer;transition:all .15s}
+.mode-card:hover{border-color:var(--border2);background:var(--bg3)}
+.mode-card.on{border-color:var(--accent);background:var(--adim2)}
+.mode-title{font-size:14px;font-weight:500;margin-bottom:4px}
+.mode-desc{font-size:12px;color:var(--text2);line-height:1.5}
+/* PAUTA CARDS */
+.pauta{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px 18px;transition:border-color .2s}
+.pauta+.pauta{margin-top:8px}
+.pauta.approved{border-color:var(--accent)}
+.pauta.rejected{border-color:var(--red);opacity:.5}
+.pauta-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:7px}
+.pauta-day{font-family:var(--m);font-size:11px;color:var(--text3);margin-right:2px}
+.pauta-title{font-size:14px;font-weight:500;margin-bottom:3px}
+.pauta-hook{font-size:12px;color:var(--text2);font-style:italic;line-height:1.5}
+.pauta-acts{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.obs-wrap{display:none;margin-top:8px}
+.obs-wrap.show{display:block}
+.obs-btn{font-size:11px;font-family:var(--m);color:var(--text3);cursor:pointer;background:none;border:none;padding:0;text-decoration:underline;text-underline-offset:2px}
+.obs-btn:hover{color:var(--text2)}
+/* COPY OUTPUT */
+.copy-out{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-top:10px;font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:var(--m);display:none}
+.copy-out.show{display:block}
+.copy-out.loading{color:var(--text3);font-style:italic;font-family:var(--f)}
+.stats-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.stat-b{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;min-width:72px}
+.stat-n{font-size:20px;font-weight:500;font-family:var(--m)}
+.stat-l{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--m)}
+.phase-banner{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--adim2);border:1px solid rgba(200,240,96,.15);border-radius:var(--r);margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.phase-banner p{font-size:12px;color:var(--accent);font-family:var(--m)}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tag{font-size:12px;padding:4px 10px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s;font-family:var(--f)}
+.tag:hover{color:var(--text)}
+.tag.on{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+.st-sec{margin-bottom:24px}
+.st-t{font-size:11px;font-family:var(--m);color:var(--text2);margin-bottom:11px;padding-bottom:6px;border-bottom:1px solid var(--border);letter-spacing:.04em}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@media(max-width:580px){
+  .sidebar{width:50px}
+  .nb span,.logo-name,.logo-mark,.nav-sec,.sf{display:none}
+  .ph,.pc{padding-left:14px;padding-right:14px}
+  .fgrid,.mode-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-mark">studio</div>
+      <div class="logo-name">Copy Studio</div>
+    </div>
+    <nav class="nav-wrap">
+      <div class="nav-sec">workspace</div>
+      <button class="nb on" onclick="go('clients')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="2.5"/><path d="M2.5 13.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
+        <span>Clientes</span>
+      </button>
+      <button class="nb" onclick="go('work')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="3" width="13" height="11" rx="2"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13"/></svg>
+        <span>Produção</span>
+      </button>
+      <div class="nav-sec">sistema</div>
+      <button class="nb" onclick="go('settings')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.5 3.5l1 1M11.5 11.5l1 1M12.5 3.5l-1 1M4.5 11.5l-1 1"/></svg>
+        <span>Configurações</span>
+      </button>
+    </nav>
+    <div class="sf">v3.0</div>
+  </aside>
+  <main class="main" id="root"></main>
+</div>
+
+<div class="modal-ov" id="modal-ov" onclick="closeModalOut(event)">
+  <div class="modal">
+    <div class="mh">
+      <div class="mt" id="modal-title"></div>
+      <button class="btn bg bsm bic" onclick="closeModal()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l9 9M11 2L2 11"/></svg>
+      </button>
+    </div>
+    <div class="mb" id="modal-body"></div>
+    <div class="mf" id="modal-foot"></div>
+  </div>
+</div>
+<div class="tw" id="toasts"></div>
+
+<script>
+// ── DB ────────────────────────────────────────────────────────────────────────
+const DB={
+  g(k){try{return JSON.parse(localStorage.getItem('cs3_'+k))}catch{return null}},
+  s(k,v){localStorage.setItem('cs3_'+k,JSON.stringify(v))},
+  clients(){return this.g('clients')||[]},
+  saveClients(d){this.s('clients',d)},
+  cfg(){return this.g('cfg')||{anthropicKey:'',geminiKey:'',model:'claude'}},
+  saveCfg(d){this.s('cfg',d)},
+  work(ci){return this.g('work_'+ci)||{step:0,mode:null,pautas:[],copies:{}}},
+  saveWork(ci,d){this.s('work_'+ci,d)}
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let page='clients', selCI=0, agGatilho='medo';
+
+function go(p){
+  page=p;
+  document.querySelectorAll('.nb').forEach(b=>{
+    b.classList.toggle('on',b.getAttribute('onclick')?.includes("'"+p+"'"));
+  });
+  render();
+}
+
+function render(){
+  const el=document.getElementById('root');
+  if(page==='clients') el.innerHTML=pgClients();
+  else if(page==='work') el.innerHTML=pgWork();
+  else if(page==='settings') el.innerHTML=pgSettings();
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function initials(n){return n?n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase():'?'}
+
+// ── CLIENTS ───────────────────────────────────────────────────────────────────
+function pgClients(){
+  const cls=DB.clients();
+  return `
+  <div class="ph">
+    <div><h1>Clientes</h1><p>${cls.length} cadastrado${cls.length!==1?'s':''}</p></div>
+    <div class="ph-r">
+      <button class="btn bg" onclick="document.getElementById('imp').click()">Importar JSON</button>
+      <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(this)">
+      <button class="btn bp" onclick="openClientModal()">+ Novo cliente</button>
+    </div>
+  </div>
+  <div class="pc">
+    ${!cls.length?`<div class="empty"><div class="ei">◈</div><div class="et">Nenhum cliente</div><div class="es">Importe um JSON ou cadastre manualmente</div></div>`:`
+    <div class="cl-grid">
+      ${cls.map((c,i)=>`
+      <div class="cl-card" onclick="goWork(${i})">
+        <div class="cl-av">${initials(c.name)}</div>
+        <div class="cl-info">
+          <div class="cl-name">${esc(c.name)}</div>
+          <div class="cl-niche">${esc(c.niche||'—')}${c.product?' · '+esc(c.product):''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${c.icp?'<span class="badge bg-g">ICP ✓</span>':'<span class="badge bg-gr">sem ICP</span>'}
+          <div class="cl-acts">
+            <button class="btn bg bsm bic" onclick="event.stopPropagation();openClientModal(${i})" title="Editar">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8.5 1.5l2 2-6 6H2.5v-2l6-6z"/></svg>
+            </button>
+            <button class="btn bg bsm bic" onclick="event.stopPropagation();exportClient(${i})" title="Exportar JSON">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v7M3.5 5.5L6 8l2.5-2.5M2 9.5v1a.5.5 0 00.5.5h7a.5.5 0 00.5-.5v-1"/></svg>
+            </button>
+            <button class="btn bd bsm bic" onclick="event.stopPropagation();delClient(${i})" title="Excluir">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h8M4.5 3V2h3v1M4.5 5v4M7.5 5v4M2.5 3l.5 7h6l.5-7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>`}
+  </div>`;
+}
+
+function goWork(i){ selCI=i; go('work'); }
+
+function openClientModal(ei){
+  const cls=DB.clients();
+  const c=ei!==undefined?cls[ei]:{};
+  const isE=ei!==undefined;
+  document.getElementById('modal-title').textContent=isE?'Editar cliente':'Novo cliente';
+  document.getElementById('modal-body').innerHTML=`
+  <div class="fgrid">
+    <div class="fg"><label class="fl">Nome do expert</label><input class="fi" id="c-name" value="${esc(c.name||'')}" placeholder="Ex: Manayra Consentino"></div>
+    <div class="fg"><label class="fl">Nicho</label><input class="fi" id="c-niche" value="${esc(c.niche||'')}" placeholder="Ex: Direito de Família"></div>
+    <div class="fg"><label class="fl">Produto / Programa</label><input class="fi" id="c-product" value="${esc(c.product||'')}" placeholder="Ex: Direitos em Paz"></div>
+    <div class="fg"><label class="fl">Ticket (R$)</label><input class="fi" id="c-ticket" value="${esc(c.ticket||'')}" placeholder="Ex: 997"></div>
+    <div class="fg fful"><label class="fl">Transformação prometida</label><input class="fi" id="c-transf" value="${esc(c.transformation||'')}" placeholder="O que o cliente conquista"></div>
+  </div>
+  <div class="sep">ICP</div>
+  <div class="fgrid">
+    <div class="fg"><label class="fl">Faixa etária</label><input class="fi" id="c-age" value="${esc(c.icp?.age||'')}" placeholder="Ex: 35–55 anos"></div>
+    <div class="fg"><label class="fl">Gênero</label><select class="fs" id="c-gender"><option value="">—</option><option value="Feminino" ${c.icp?.gender==='Feminino'?'selected':''}>Feminino</option><option value="Masculino" ${c.icp?.gender==='Masculino'?'selected':''}>Masculino</option><option value="Misto" ${c.icp?.gender==='Misto'?'selected':''}>Misto</option></select></div>
+    <div class="fg fful"><label class="fl">Perfil / ocupação</label><input class="fi" id="c-occ" value="${esc(c.icp?.occupation||'')}" placeholder="Ex: Profissionais liberais, casadas, donas de negócio"></div>
+    <div class="fg fful"><label class="fl">Dor principal (voz do cliente)</label><textarea class="ft" id="c-pain" placeholder="Ex: Não sei o que acontece com meus bens se eu me separar">${esc(c.icp?.pain||'')}</textarea></div>
+    <div class="fg fful"><label class="fl">Frases literais da persona (uma por linha)</label><textarea class="ft" id="c-phrases" style="min-height:90px" placeholder="Ex:\nEu nem sei o que eu assinei quando a gente casou.">${esc((c.icp?.phrases||[]).join('\n'))}</textarea></div>
+    <div class="fg fful"><label class="fl">Objeções principais (uma por linha)</label><textarea class="ft" id="c-obj" placeholder="Ex:\nNão tenho processo, não preciso de advogado.">${esc((c.icp?.objections||[]).join('\n'))}</textarea></div>
+    <div class="fg fful"><label class="fl">Voz do expert</label><textarea class="ft" id="c-voice" placeholder="Ex: Descontraída, usa casos reais, não é espalhafatosa">${esc(c.icp?.voice||'')}</textarea></div>
+    <div class="fg fful"><label class="fl">O que o expert rejeita em copy</label><input class="fi" id="c-rej" value="${esc(c.icp?.rejects||'')}" placeholder="Ex: tom provocativo, palavras como incrível, jornada"></div>
+  </div>`;
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn bg" onclick="closeModal()">Cancelar</button>
+    <button class="btn bp" onclick="saveClient(${isE?ei:'undefined'})">Salvar</button>`;
+  openModal();
+}
+
+function saveClient(ei){
+  const cls=DB.clients();
+  const phrases=document.getElementById('c-phrases').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const objections=document.getElementById('c-obj').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const c={
+    name:document.getElementById('c-name').value.trim(),
+    niche:document.getElementById('c-niche').value.trim(),
+    product:document.getElementById('c-product').value.trim(),
+    ticket:document.getElementById('c-ticket').value.trim(),
+    transformation:document.getElementById('c-transf').value.trim(),
+    icp:{
+      age:document.getElementById('c-age').value.trim(),
+      gender:document.getElementById('c-gender').value,
+      occupation:document.getElementById('c-occ').value.trim(),
+      pain:document.getElementById('c-pain').value.trim(),
+      phrases,objections,
+      voice:document.getElementById('c-voice').value.trim(),
+      rejects:document.getElementById('c-rej').value.trim()
+    }
+  };
+  if(!c.name){toast('Nome obrigatório','err');return}
+  if(ei!==undefined&&ei!=='undefined') cls[ei]=c; else cls.push(c);
+  DB.saveClients(cls);
+  closeModal();render();
+  toast('Cliente salvo','ok');
+}
+
+function delClient(i){
+  if(!confirm('Excluir este cliente?')) return;
+  const cls=DB.clients(); cls.splice(i,1); DB.saveClients(cls); render(); toast('Excluído');
+}
+
+function exportClient(i){
+  const c=DB.clients()[i];
+  const blob=new Blob([JSON.stringify(c,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(c.name||'cliente').toLowerCase().replace(/\s+/g,'-')+'-icp.json';
+  a.click();URL.revokeObjectURL(a.href);
+  toast('JSON exportado','ok');
+}
+
+function importJSON(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      const cls=DB.clients();
+      const list=Array.isArray(data)?data:[data];
+      let n=0;
+      list.forEach(c=>{
+        if(!c.name)return;
+        const ei=cls.findIndex(x=>x.name===c.name);
+        if(ei>=0) cls[ei]=c; else cls.push(c);
+        n++;
+      });
+      DB.saveClients(cls);render();
+      toast(n+' cliente'+(n!==1?'s':'')+' importado'+(n!==1?'s':''),'ok');
+    }catch{toast('JSON inválido','err')}
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ── WORK PAGE ─────────────────────────────────────────────────────────────────
+function pgWork(){
+  const cls=DB.clients();
+  if(!cls.length) return `<div class="ph"><h1>Produção</h1></div><div class="pc"><div class="empty"><div class="ei">◈</div><div class="et">Cadastre um cliente primeiro</div></div></div>`;
+
+  const c=cls[selCI];
+  const w=DB.work(selCI);
+
+  return `
+  <div class="ph">
+    <div><h1>Produção</h1><p>${esc(c.name)}</p></div>
+    <div class="ph-r">
+      <select class="fs" style="width:auto;font-size:12px" onchange="selCI=parseInt(this.value);render()">
+        ${cls.map((cl,i)=>`<option value="${i}" ${i===selCI?'selected':''}>${esc(cl.name)}</option>`).join('')}
+      </select>
+      ${w.step>0?`<button class="btn bg bsm" onclick="resetWork()">Reiniciar</button>`:''}
+    </div>
+  </div>
+  <div class="pc">
+    ${renderStepBar(w.step)}
+    ${w.step===0?renderStep0():
+      w.step===1?renderStep1(w,c):
+      w.step===2?renderStep2(w,c):''}
+  </div>`;
+}
+
+function renderStepBar(step){
+  const steps=['Modo','Pautas','Copies'];
+  return `<div class="step-bar">
+    ${steps.map((s,i)=>`
+      ${i>0?'<div class="step-sep"></div>':''}
+      <div class="step ${i===step?'on':i<step?'done':''}">
+        <div class="step-n">${i<step?'✓':i+1}</div>
+        <span>${s}</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+// STEP 0 — escolha do modo
+function renderStep0(){
+  return `
+  <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Como quer produzir?</p>
+  <div class="mode-grid">
+    <div class="mode-card" onclick="setMode('semanal')">
+      <div class="mode-title">Calendário semanal</div>
+      <div class="mode-desc">5 pautas distribuídas por estágio de consciência e gatilho. Segunda a sexta.</div>
+    </div>
+    <div class="mode-card" onclick="setMode('avulso')">
+      <div class="mode-title">Copy avulsa</div>
+      <div class="mode-desc">Uma pauta específica. Para urgências, stories ou CTAs pontuais.</div>
+    </div>
+  </div>`;
+}
+
+function setMode(mode){
+  const w=DB.work(selCI);
+  w.mode=mode;
+  w.step=1;
+  w.pautas=[];
+  w.copies={};
+  if(mode==='semanal'){
+    w.pautas=gerarPautasSemanal(selCI);
+  }
+  DB.saveWork(selCI,w);
+  render();
+}
+
+// STEP 1 — aprovação de pautas
+function renderStep1(w,c){
+  const pautas=w.pautas||[];
+  const approved=pautas.filter(p=>p.status==='approved').length;
+  const rejected=pautas.filter(p=>p.status==='rejected').length;
+  const total=pautas.length;
+  const allDone=total>0&&(approved+rejected)===total;
+
+  if(w.mode==='avulso'&&!pautas.length){
+    return renderAvulsoForm(c);
+  }
+
+  return `
+  <div class="stats-row">
+    <div class="stat-b"><div class="stat-n">${total}</div><div class="stat-l">pautas</div></div>
+    <div class="stat-b"><div class="stat-n">${approved}</div><div class="stat-l">aprovadas</div></div>
+    <div class="stat-b"><div class="stat-n">${rejected}</div><div class="stat-l">recusadas</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--text2);margin-bottom:14px;font-family:var(--m)">Revise e aprove as pautas antes de gerar as copies.</p>
+  <div id="pautas-grid">
+    ${pautas.map((p,i)=>renderPauta(p,i)).join('')}
+  </div>
+  ${allDone?`
+  <div style="margin-top:18px">
+    <div class="phase-banner">
+      <p>${approved} pauta${approved!==1?'s':''} aprovada${approved!==1?'s':''}. Pronto para gerar as copies.</p>
+      <button class="btn bp bsm" onclick="irParaCopies()">Gerar copies ↗</button>
+    </div>
+  </div>`:''}`;
+}
+
+function renderAvulsoForm(c){
+  const FMTS=['Reels','Carrossel','Legenda de post','Stories','CTA'];
+  const ESTS=['Inconsciente','Consciente do problema','Consciente da solução','Consciente do produto','Pronto para comprar'];
+  const GATS=['Medo de não estar protegida','Proteger a família','Fazer do jeito certo','Caso real / celebridade','Curiosidade'];
+  return `
+  <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Defina a pauta. Depois você aprova antes de gerar.</p>
+  <div class="fgrid">
+    <div class="fg"><label class="fl">Formato</label><select class="fs" id="av-fmt">${FMTS.map(f=>`<option>${f}</option>`).join('')}</select></div>
+    <div class="fg"><label class="fl">Estágio de consciência</label><select class="fs" id="av-est">${ESTS.map(e=>`<option>${e}</option>`).join('')}</select></div>
+    <div class="fg fful"><label class="fl">Tema / gancho</label><input class="fi" id="av-tema" placeholder="Ex: caso Claudia Raia, regime de bens, inventário com irmãos..."></div>
+    <div class="fg fful"><label class="fl">Gatilho dominante</label><select class="fs" id="av-gat">${GATS.map(g=>`<option>${g}</option>`).join('')}</select></div>
+    <div class="fg fful"><label class="fl">Hook sugerido (opcional)</label><input class="fi" id="av-hook" placeholder="Primeira frase que para o scroll..."></div>
+    <div class="fg fful"><label class="fl">Observações para a copy (opcional)</label><textarea class="ft" id="av-obs" placeholder="Tom desejado, objeção a endereçar, contexto atual..."></textarea></div>
+  </div>
+  <button class="btn bp" onclick="criarPautaAvulsa()">Criar pauta ↗</button>`;
+}
+
+function criarPautaAvulsa(){
+  const tema=document.getElementById('av-tema')?.value.trim();
+  if(!tema){toast('Preencha o tema','err');return}
+  const p={
+    dia:'Avulso',
+    formato:document.getElementById('av-fmt').value,
+    estagio:document.getElementById('av-est').value,
+    gatilho:document.getElementById('av-gat').value,
+    titulo:tema,
+    hook:document.getElementById('av-hook')?.value.trim()||'',
+    obs:document.getElementById('av-obs')?.value.trim()||'',
+    status:'pending'
+  };
+  const w=DB.work(selCI);
+  w.pautas=[p];
+  DB.saveWork(selCI,w);
+  render();
+}
+
+function renderPauta(p,i){
+  const isA=p.status==='approved', isR=p.status==='rejected';
+  return `
+  <div class="pauta ${isA?'approved':''} ${isR?'rejected':''}">
+    <div class="pauta-meta">
+      <span class="pauta-day">${p.dia}</span>
+      <span class="badge ${p.formato==='Reels'?'bg-b':'bg-a'}">${p.formato}</span>
+      <span class="badge bg-gr">${p.estagio}</span>
+      <span class="badge bg-gr">${p.gatilho}</span>
+      ${isA?'<span class="badge bg-g">aprovado</span>':''}
+      ${isR?'<span class="badge bg-r">recusado</span>':''}
+    </div>
+    <div class="pauta-title">${esc(p.titulo)}</div>
+    ${p.hook?`<div class="pauta-hook">"${esc(p.hook)}"</div>`:''}
+    <div class="pauta-acts">
+      ${!isA&&!isR?`
+        <button class="btn bsm" style="border-color:rgba(200,240,96,.4);color:var(--accent);background:var(--adim2)" onclick="setPStatus(${i},'approved')">Aprovar</button>
+        <button class="btn bsm" style="border-color:rgba(255,95,95,.3);color:var(--red);background:var(--rdim)" onclick="setPStatus(${i},'rejected')">Recusar</button>`:''}
+      ${isA||isR?`<button class="btn bg bsm" onclick="setPStatus(${i},'pending')">Reabrir</button>`:''}
+      <button class="obs-btn" onclick="toggleObs('obs-${i}')">+ obs</button>
+    </div>
+    <div class="obs-wrap" id="obs-${i}">
+      <textarea class="ft" style="min-height:44px;font-size:12px;margin-top:6px" placeholder="Ajustes para a copy..." onchange="saveObs(${i},this.value)">${esc(p.obs||'')}</textarea>
+    </div>
+  </div>`;
+}
+
+function setPStatus(i,status){
+  const w=DB.work(selCI);
+  w.pautas[i].status=status;
+  DB.saveWork(selCI,w);
+  render();
+}
+
+function saveObs(i,val){
+  const w=DB.work(selCI);
+  if(w.pautas[i]) w.pautas[i].obs=val;
+  DB.saveWork(selCI,w);
+}
+
+function toggleObs(id){document.getElementById(id)?.classList.toggle('show')}
+
+function irParaCopies(){
+  const w=DB.work(selCI);
+  w.step=2;
+  DB.saveWork(selCI,w);
+  render();
+}
+
+// STEP 2 — copies
+function renderStep2(w,c){
+  const aprovadas=w.pautas.filter(p=>p.status==='approved');
+  return `
+  <div class="phase-banner" style="margin-bottom:18px">
+    <p>${aprovadas.length} pauta${aprovadas.length!==1?'s':''} aprovada${aprovadas.length!==1?'s':''}. Gere individualmente ou todas de uma vez.</p>
+    <button class="btn bp bsm" onclick="genAll()">Gerar todas ↗</button>
+  </div>
+  <div id="copies-area">
+    ${aprovadas.map((p,i)=>renderCopyCard(p,i,w.copies,c)).join('')}
+  </div>`;
+}
+
+function renderCopyCard(p,i,copies,c){
+  const key=mkKey(p);
+  const copy=copies[key]||'';
+  const outId='co-'+key;
+  return `
+  <div class="card" style="margin-bottom:8px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+      <div>
+        <div style="display:flex;gap:5px;margin-bottom:5px">
+          <span class="badge ${p.formato==='Reels'?'bg-b':'bg-a'}">${p.formato}</span>
+          <span style="font-size:11px;color:var(--text2);font-family:var(--m);align-self:center">${p.dia}</span>
+        </div>
+        <div style="font-size:14px;font-weight:500">${esc(p.titulo)}</div>
+        ${p.hook?`<div style="font-size:12px;color:var(--text2);font-style:italic;margin-top:3px">"${esc(p.hook)}"</div>`:''}
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="btn bg bsm" onclick="genCopy('${esc(JSON.stringify(p))}','${key}')">Gerar ↗</button>
+        ${copy?`<button class="btn bg bsm" onclick="clipEl('${outId}')">Copiar</button>`:''}
+      </div>
+    </div>
+    <div class="copy-out ${copy?'show':''}" id="${outId}">${esc(copy)}</div>
+  </div>`;
+}
+
+function mkKey(p){return(p.dia+'_'+p.titulo).replace(/[^a-z0-9]/gi,'_').toLowerCase().slice(0,50)}
+
+async function genCopy(pJson,key){
+  let p;
+  try{p=JSON.parse(pJson)}catch{toast('Erro interno','err');return}
+  const cls=DB.clients();
+  const c=cls[selCI];
+  const outId='co-'+key;
+  const el=document.getElementById(outId);
+  if(el){el.className='copy-out show loading';el.textContent='Gerando...'}
+
+  const FMTI={
+    'Reels':'Roteiro Reels 60–90s. Labels obrigatórios: [GANCHO] [DESENVOLVIMENTO] [CTA]',
+    'Carrossel':'Carrossel 6–8 slides. Separe com "— Slide N —". Capa com headline, último com CTA.',
+    'Legenda de post':'Legenda Instagram. Abertura que para o scroll. Corpo com valor. CTA no final.',
+    'Stories':'5–7 telas. Cada tela = uma linha curta. Ritmo rápido. Última tela com CTA.',
+    'CTA':'3 variações de CTA: urgência, benefício e prova social.'
+  };
+  const sys=buildSys(c);
+  const usr=`PAUTA APROVADA:
+Dia: ${p.dia} | Formato: ${p.formato} | Estágio: ${p.estagio} | Gatilho: ${p.gatilho}
+Tema: ${p.titulo}
+${p.hook?'Hook: "'+p.hook+'"':''}
+${p.obs?'Observação da copywriter: '+p.obs:''}
+
+INSTRUÇÃO DE FORMATO: ${FMTI[p.formato]||'Copy estruturada para este formato.'}
+
+Entregue direto o copy pronto. Sem introdução, sem explicação.`;
+
+  try{
+    const cfg=DB.cfg();
+    const txt=cfg.model==='gemini'?await callGemini(sys,usr):await callClaude(sys,usr);
+    const w=DB.work(selCI);
+    w.copies[key]=txt;
+    DB.saveWork(selCI,w);
+    if(el){el.className='copy-out show';el.textContent=txt}
+    toast('Copy gerada!','ok');
+    // re-render copy card to show copy button
+    render();
+  }catch(e){
+    console.error(e);
+    if(el){el.className='copy-out show loading';el.textContent='Erro: '+e.message}
+    toast('Erro ao gerar. Verifique a API em Configurações.','err');
+  }
+}
+
+async function genAll(){
+  const w=DB.work(selCI);
+  const aprovadas=w.pautas.filter(p=>p.status==='approved');
+  for(const p of aprovadas){
+    await genCopy(JSON.stringify(p),mkKey(p));
+  }
+}
+
+function clipEl(id){
+  const el=document.getElementById(id);
+  if(el) navigator.clipboard.writeText(el.textContent).then(()=>toast('Copiado!','ok'));
+}
+
+function resetWork(){
+  if(!confirm('Reiniciar produção deste cliente?')) return;
+  DB.saveWork(selCI,{step:0,mode:null,pautas:[],copies:{}});
+  render();
+}
+
+// ── GERADOR DE PAUTAS SEMANAL (LOCAL — sem API) ──────────────────────────────
+function gerarPautasSemanal(ci){
+  const cls=DB.clients();
+  const c=cls[ci];
+  const produto=c?.product||'o programa';
+  const nicho=c?.niche||'';
+  const pain=c?.icp?.pain||'';
+  const phrases=c?.icp?.phrases||[];
+
+  // Templates adaptados ao ICP do cliente
+  const pool=[
+    {
+      dia:'Segunda',formato:'Reels',estagio:'Inconsciente',gatilho:'Caso real / celebridade',
+      titulo:`Momento do Júri — caso de celebridade sobre ${nicho}`,
+      hook:phrases[0]?`"${phrases[0]}" — você também pensa assim?`:`O que aconteceu nesse caso mudou o que eu penso sobre ${nicho}.`
+    },
+    {
+      dia:'Terça',formato:'Carrossel',estagio:'Consciente do problema',gatilho:'Medo',
+      titulo:`5 perguntas sobre ${nicho} que a maioria não sabe responder`,
+      hook:`Se você travar em mais de duas, você não está protegida — e provavelmente nem sabe disso.`
+    },
+    {
+      dia:'Quarta',formato:'Reels',estagio:'Consciente da solução',gatilho:'Fazer do jeito certo',
+      titulo:`O que ninguém te ensinou sobre ${nicho} — e deveria`,
+      hook:`Ninguém te ensinou isso. Eu explico em 60 segundos.`
+    },
+    {
+      dia:'Quinta',formato:'Carrossel',estagio:'Inconsciente',gatilho:'Proteger a família',
+      titulo:`O que sua família perde se você não se preparar agora`,
+      hook:`Você pensa em tudo pela sua família. Mas pensou nisso?`
+    },
+    {
+      dia:'Sexta',formato:'Reels',estagio:'Consciente do produto',gatilho:'Medo',
+      titulo:`Por que você não precisa ter problema aberto para precisar de ${produto}`,
+      hook:pain?`${pain} — esse é exatamente o momento de agir.`:`Quando o problema começa, já é tarde para se preparar.`
+    }
+  ];
+  return pool.map(p=>({...p,status:'pending',obs:''}));
+}
+
+// ── SYSTEM PROMPT ─────────────────────────────────────────────────────────────
+function buildSys(c){
+  const icp=c?.icp||{};
+  const phrases=(icp.phrases||[]).map(p=>`- "${p}"`).join('\n');
+  const objs=(icp.objections||[]).map(o=>`- ${o}`).join('\n');
+  return `Você é um copywriter da escola americana clássica — discípulo direto de Gary Halbert. Estudou Ogilvy, Caples, Hopkins, Dan Kennedy e Eugene Schwartz. Escreve copy que vende sem parecer que está vendendo.
+
+CLIENTE: ${c?.name||'—'} | Nicho: ${c?.niche||'—'} | Produto: ${c?.product||'—'} | Ticket: R$${c?.ticket||'—'}
+TRANSFORMAÇÃO: ${c?.transformation||'—'}
+
+ICP:
+- Faixa etária: ${icp.age||'—'}
+- Gênero: ${icp.gender||'—'}
+- Perfil: ${icp.occupation||'—'}
+- Dor principal: ${icp.pain||'—'}
+${phrases?'FRASES LITERAIS DA PERSONA:\n'+phrases:''}
+${objs?'OBJEÇÕES:\n'+objs:''}
+VOZ DO EXPERT: ${icp.voice||'—'}
+O QUE REJEITA: ${icp.rejects||'—'}
+
+REGRAS (escola Halbert):
+1. Gancho nos primeiros 3 segundos — ou perdeu.
+2. Fale com UMA pessoa. Nunca "vocês".
+3. Especificidade vende. Detalhe concreto > generalidade.
+4. Proibido: incrível, transformador, jornada, empoderamento, protagonista.
+5. Jargão técnico só com explicação na mesma frase.
+6. Produto é sempre "${c?.product||'o programa'}" — nunca "curso".
+7. CTA concreto. Nunca "saiba mais".
+8. Tom de carta para um amigo que precisa ouvir isso.`;
+}
+
+// ── API ───────────────────────────────────────────────────────────────────────
+async function callClaude(sys,usr){
+  const k=DB.cfg().anthropicKey;
+  if(!k) throw new Error('Chave Anthropic não configurada em Configurações');
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:sys,messages:[{role:'user',content:usr}]})
+  });
+  const d=await r.json();
+  if(d.error) throw new Error(d.error.message);
+  return d.content?.find(b=>b.type==='text')?.text||'';
+}
+
+async function callGemini(sys,usr){
+  const k=DB.cfg().geminiKey;
+  if(!k) throw new Error('Chave Gemini não configurada em Configurações');
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      system_instruction:{parts:[{text:sys}]},
+      contents:[{role:'user',parts:[{text:usr}]}],
+      generationConfig:{maxOutputTokens:2000}
+    })
+  });
+  const d=await r.json();
+  if(d.error) throw new Error(d.error.message);
+  return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function pgSettings(){
+  const s=DB.cfg();
+  return `
+  <div class="ph"><div><h1>Configurações</h1></div></div>
+  <div class="pc" style="max-width:480px">
+    <div class="st-sec">
+      <div class="st-t">chaves de API</div>
+      <div class="fg"><label class="fl">Anthropic (Claude Sonnet 4.6)</label><input class="fi" type="password" id="s-ant" value="${esc(s.anthropicKey||'')}" placeholder="sk-ant-..."></div>
+      <div class="fg"><label class="fl">Google (Gemini)</label><input class="fi" type="password" id="s-gem" value="${esc(s.geminiKey||'')}" placeholder="AIza..."></div>
+    </div>
+    <div class="st-sec">
+      <div class="st-t">modelo padrão</div>
+      <div class="fg"><select class="fs" id="s-mod">
+        <option value="claude" ${s.model==='claude'?'selected':''}>Claude Sonnet 4.6 (Anthropic)</option>
+        <option value="gemini" ${s.model==='gemini'?'selected':''}>Gemini 2.0 Flash (Google)</option>
+      </select></div>
+    </div>
+    <button class="btn bp" onclick="saveCfg()">Salvar configurações</button>
+    <div class="st-sec" style="margin-top:28px">
+      <div class="st-t">dados locais</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Tudo salvo no seu navegador. Nenhum dado vai para servidor.</p>
+      <button class="btn bd bsm" onclick="if(confirm('Apagar todos os dados?')){localStorage.clear();render();toast('Dados apagados')}">Apagar todos os dados</button>
+    </div>
+  </div>`;
+}
+
+function saveCfg(){
+  DB.saveCfg({
+    anthropicKey:document.getElementById('s-ant')?.value.trim()||'',
+    geminiKey:document.getElementById('s-gem')?.value.trim()||'',
+    model:document.getElementById('s-mod')?.value||'claude'
+  });
+  toast('Configurações salvas','ok');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(){document.getElementById('modal-ov').classList.add('show')}
+function closeModal(){document.getElementById('modal-ov').classList.remove('show')}
+function closeModalOut(e){if(e.target===document.getElementById('modal-ov'))closeModal()}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg,type=''){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className='toast '+(type==='ok'?'tok':type==='err'?'terr':'');
+  t.textContent=msg;
+  c.appendChild(t);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300)},2600);
+}
+
+render();
+</script>
+</body>
+</html>
